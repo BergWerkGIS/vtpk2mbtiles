@@ -1,0 +1,2 @@
+REM dotnet run ..\..\OFFLINE-VTPK\L06\R0000C0000.bundle ..\..\OFFLINE-VTPK\tilemap\root.json
+rd /S /Q tiles-from-bundle\ & dotnet run ..\..\OFFLINE-VTPK\bmapv_vtpk_3857\ tiles-from-bundle\ > convert.log
