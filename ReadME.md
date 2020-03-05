@@ -63,7 +63,7 @@ Abort processing with `Ctrl+C`.
 * convert to mbtiles, not decompressing tiles:
 ```bash
 docker run -it --rm --name vtpk2mbtiles \
- --mount src="${HOME}/basemap",dst=/data,type=bind vtpk2mbtiles \
+ --mount src="${HOME}/basemap",dst=/data,type=bind bergwerkgis/vtpk2mbtiles \
  /data/bmapv_vtpk_3857 \
  /data/bmapv.mbtiles \
  false
@@ -71,7 +71,7 @@ docker run -it --rm --name vtpk2mbtiles \
 * extract tiles to file system, unzip tiles:
 ```bash
 docker run -it --rm --name vtpk2mbtiles \
- --mount src="${HOME}/basemap",dst=/data,type=bind vtpk2mbtiles \
+ --mount src="${HOME}/basemap",dst=/data,type=bind bergwerkgis/vtpk2mbtiles \
  /data/bmapv_vtpk_3857 \
  /data/bmapv-tiles \
  true
@@ -98,7 +98,7 @@ docker run -it --rm ^
  --name vtpk2mbtiles ^
  -m 4g ^
  --cpus=%NUMBER_OF_PROCESSORS% ^
- --mount src="C:\basemap",dst=/data,type=bind vtpk2mbtiles ^
+ --mount src="C:\basemap",dst=/data,type=bind bergwerkgis/vtpk2mbtiles ^
  /data/bmapv_vtpk_3857 ^
  /data/bmapv.mbtiles ^
  false
@@ -109,7 +109,7 @@ docker run -it --rm ^
  --name vtpk2mbtiles ^
  -m 4g ^
  --cpus=%NUMBER_OF_PROCESSORS% ^
- --mount src="C:\basemap",dst=/data,type=bind vtpk2mbtiles ^
+ --mount src="C:\basemap",dst=/data,type=bind bergwerkgis/vtpk2mbtiles ^
  /data/bmapv_vtpk_3857 ^
  /data/bmapv-tiles ^
  false
