@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using static System.FormattableString;
 
@@ -34,19 +35,32 @@ namespace vtpk2mbtiles {
 			executeCmd("PRAGMA journal_mode=MEMORY");
 			executeCmd("PRAGMA temp_store=MEMORY");
 
-			executeCmd(File.ReadAllText("schema.sql"));
+			string schema;
+			if (File.Exists("schema.sql")) {
+				schema = File.ReadAllText("schema.sql");
+			} else {
+				Assembly assembly = Assembly.GetExecutingAssembly();
+				using (TextReader tr = new StreamReader(assembly.GetManifestResourceStream("vtpk2mbtiles.schema.sql"))) {
+					schema = tr.ReadToEnd();
+				}
+			}
+			if (string.IsNullOrWhiteSpace(schema)) {
+				throw new Exception("mbtiles schema not found");
+			}
 
-            executeCmd(string.Join(
-                "; "
-                , $"INSERT INTO metadata (name, value) VALUES ('name', '{md.Name}');"
-                , $"INSERT INTO metadata (name, value) VALUES ('description', 'Created with vtpk2mbtiles by BergWerk GIS - https://github.com/BergWerkGIS/vtpk2mbtiles');"
-                , $"INSERT INTO metadata (name, value) VALUES ('bounds', '{md.Bounds()}');"
-                , $"INSERT INTO metadata (name, value) VALUES ('center', '{md.Center()}');"
-                , $"INSERT INTO metadata (name, value) VALUES ('minzoom', '{md.MinZoom}');"
-                , $"INSERT INTO metadata (name, value) VALUES ('maxzoom', '{md.MaxZoom}');"
-                , $"INSERT INTO metadata (name, value) VALUES ('json', '{md.VectorLayers}');"
-                , "INSERT INTO metadata (name, value) VALUES ('format', 'pbf');"
-            ));
+			executeCmd(schema);
+
+			executeCmd(string.Join(
+				"; "
+				, $"INSERT INTO metadata (name, value) VALUES ('name', '{md.Name}');"
+				, $"INSERT INTO metadata (name, value) VALUES ('description', 'Created with vtpk2mbtiles by BergWerk GIS - https://github.com/BergWerkGIS/vtpk2mbtiles');"
+				, $"INSERT INTO metadata (name, value) VALUES ('bounds', '{md.Bounds()}');"
+				, $"INSERT INTO metadata (name, value) VALUES ('center', '{md.Center()}');"
+				, $"INSERT INTO metadata (name, value) VALUES ('minzoom', '{md.MinZoom}');"
+				, $"INSERT INTO metadata (name, value) VALUES ('maxzoom', '{md.MaxZoom}');"
+				, $"INSERT INTO metadata (name, value) VALUES ('json', '{md.VectorLayers}');"
+				, "INSERT INTO metadata (name, value) VALUES ('format', 'pbf');"
+			));
 		}
 
 
@@ -139,335 +153,6 @@ namespace vtpk2mbtiles {
 				Console.WriteLine($"ERROR executing database command:{Environment.NewLine}{cmdSql}{Environment.NewLine}{ex}");
 				return false;
 			}
-		}
-
-
-		private string vector_layers() {
-            //https://maps.wien.gv.at/basemapv/bmapv/3857/tile.json
-            string json = @"{
-""vector_layers"": [
-        {
-            ""id"": ""NUTZUNG_F_NUTZUNG_L11_0"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NUTZUNG_F_NUTZUNG_L15_12"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NUTZUNG_F_NUTZUNG_L16_16"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEWAESSER_L_GEWLUnterirdisch"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEWAESSER_L_GEWL "",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEWAESSER_F_GEWF"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_BAUWERK_L_TUNNEL_BRUNNENCLA"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_OUTSIDE_BAUWERK_L_TUNNEL"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_INSIDE_BAUWERK_L_TUNNEL"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_F_NATURBESTAND_F"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""BEV_LAND_250_L_LANDESGRENZE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""BEV_STAAT_250_L_STAATSGRENZE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""BEV_GEMEINDE_L_GEMEINDEGRENZE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""BEV_BEZIRK_L_BEZIRKSGRENZE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""BEV_LAND_L_LANDESGRENZE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""BEV_STAAT_L_STAATSGRENZE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEBAEUDE_F_GEBAEUDE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEBAEUDE_F_AGG"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_L_NATURBESTAND_L"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_F_GEBUESCH"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_P_BAUM"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_INSIDE_L_GIP"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_INSIDE_BAUWERK_L_BRÜCKE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_L_GIP_144"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_L_GIP_Merge144"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_OUTSIDE_L_GIP"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_BAUWERK_L_BRÜCKE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_OUTSIDE_BAUWERK_L_BRÜCKE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_L_Ubahn"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEONAMEN_P_KIRCHE_KAPELLE"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""SIEDLUNG_P_BEZHPTSTADT"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""SIEDLUNG_P_SIEDLUNG"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""LANDESHAUPTSTADT_P"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIPFEL_L09-16"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""FLUGHAFEN_P_FLUGHAFEN"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_P_U-BAHNZUGANG (TXT)"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_F_GRAB"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEWAESSER_L_GEWL /label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEWAESSER_F_GEWF/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_OUTSIDE_BAUWERK_L_TUNNEL/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_BAUWERK_L_TUNNEL_BRUNNENCLA/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GEONAMEN_P_GEONAMEN"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_BAUWERK_L_BRÜCKE/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_OUTSIDE_BAUWERK_L_BRÜCKE/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_L_Ubahn/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_P_REIHE_NUMMER"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""NATURBESTAND_F_GRAB/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_OUTSIDE_L_GIP/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_INSIDE_L_GIP/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_INSIDE_BAUWERK_L_TUNNEL/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_L_GIP_144/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_L_GIP_Merge144/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        },
-        {
-            ""id"": ""GIP_INSIDE_BAUWERK_L_BRÜCKE/label"",
-            ""fields"": {},
-            ""minzoom"": 8,
-            ""maxzoom"": 16
-        }
-    ]
-}
-";
-            return json.Replace(Environment.NewLine, "");
 		}
 
 

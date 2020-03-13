@@ -6,6 +6,9 @@
     <Platforms>x64</Platforms>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+    <AssemblyVersion>0.0.0.2</AssemblyVersion>
+    <FileVersion>0.0.0.2</FileVersion>
+    <Version>0.0.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,9 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="schema.sql">
+    <EmbeddedResource Include="schema.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
